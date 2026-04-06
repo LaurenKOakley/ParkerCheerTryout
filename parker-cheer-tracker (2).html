@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parker's Cheer Tracker ⭐</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1f44;
+    --navy-mid: #122a5e;
+    --navy-light: #1e3a7a;
+    --white: #ffffff;
+    --gold: #f5c842;
+    --gold-light: #fde68a;
+    --silver: #e2e8f0;
+    --check-green: #22c55e;
+    --bg: #f0f4ff;
+    --card: #ffffff;
+    --shadow: 0 4px 20px rgba(10,31,68,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 28px 20px 22px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px; right: -40px; bottom: -10px;
+    background: radial-gradient(ellipse at 60% 0%, #1e3a7a 0%, transparent 70%),
+                radial-gradient(ellipse at 20% 100%, #0d2450 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .stars-bg {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .star {
+    position: absolute; color: var(--gold); font-size: 14px; opacity: 0.3; animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:0.7;transform:scale(1.2)} }
+  .header-inner { position: relative; z-index: 1; }
+  .cheer-emoji { font-size: 48px; display: block; margin-bottom: 4px; }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    color: var(--white);
+    font-size: clamp(28px, 6vw, 48px);
+    letter-spacing: 1px;
+    line-height: 1.1;
+  }
+  header h1 span { color: var(--gold); }
+  .subtitle {
+    color: #a8c4f5;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-section {
+    background: var(--navy-mid);
+    padding: 16px 20px;
+    text-align: center;
+  }
+  .progress-label {
+    color: #a8c4f5;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .progress-bar-wrap {
+    max-width: 500px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    height: 18px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #f97316);
+    border-radius: 20px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    min-width: 0;
+  }
+  .progress-text {
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 800;
+    margin-top: 6px;
+  }
+  .skills-earned {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .skill-badge {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    color: #a8c4f5;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.3s;
+  }
+  .skill-badge.earned {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+  }
+
+  /* MAIN */
+  main { max-width: 700px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* WEEK TABS */
+  .week-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .week-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 8px;
+    border: 2px solid var(--navy-light);
+    background: white;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .week-btn:hover { background: var(--navy); color: white; }
+  .week-btn.active { background: var(--navy); color: var(--gold); border-color: var(--navy); }
+  .week-btn .week-prog {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  /* PRACTICE CARD */
+  .practice-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .practice-card.today { border-color: var(--gold); }
+  .practice-card.complete { border-color: var(--check-green); }
+
+  .card-header {
+    background: var(--navy);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-header-left { display: flex; align-items: center; gap: 12px; }
+  .date-badge {
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 10px;
+    padding: 4px 12px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .practice-card.today .date-badge { background: #f97316; color: white; }
+  .practice-card.complete .date-badge { background: var(--check-green); color: white; }
+  .card-title {
+    color: var(--white);
+    font-weight: 800;
+    font-size: 15px;
+  }
+  .card-sub {
+    color: #a8c4f5;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #a8c4f5;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .card-status.done { color: var(--check-green); }
+  .chevron { transition: transform 0.3s; font-size: 14px; color: #a8c4f5; }
+  .chevron.open { transform: rotate(180deg); }
+  .today-tag {
+    background: #f97316;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* CARD BODY */
+  .card-body {
+    display: none;
+    padding: 18px;
+  }
+  .card-body.open { display: block; }
+
+  /* SECTIONS */
+  .section-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--navy-light);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1.5px;
+    background: var(--silver);
+    border-radius: 2px;
+  }
+
+  /* TASK ITEMS */
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--silver);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-item:hover { opacity: 0.85; }
+  .task-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 2.5px solid var(--navy-light);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s;
+    font-size: 16px;
+    margin-top: 1px;
+  }
+  .task-item.checked .task-check {
+    background: var(--check-green);
+    border-color: var(--check-green);
+  }
+  .task-text {
+    flex: 1;
+  }
+  .task-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--navy);
+    line-height: 1.3;
+    transition: all 0.25s;
+  }
+  .task-item.checked .task-name {
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+  .task-tip {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 3px;
+    font-weight: 600;
+  }
+  .task-duration {
+    background: var(--bg);
+    color: var(--navy-light);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* SECTION SPACER */
+  .section-gap { margin-top: 16px; }
+
+  /* COMPLETE STAMP */
+  .complete-stamp {
+    text-align: center;
+    padding: 14px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-radius: 12px;
+    margin-top: 14px;
+    display: none;
+    animation: stampIn 0.4s cubic-bezier(.17,.67,.35,1.3);
+  }
+  @keyframes stampIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+  .complete-stamp.show { display: block; }
+  .complete-stamp .stamp-emoji { font-size: 32px; }
+  .complete-stamp p { font-weight: 800; color: var(--check-green); font-size: 15px; margin-top: 4px; }
+
+  /* MOTIVATION */
+  .motivation-box {
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .motivation-box::before {
+    content: '⭐';
+    position: absolute;
+    font-size: 80px;
+    opacity: 0.06;
+    top: -10px; right: 10px;
+  }
+  .motivation-box h3 {
+    color: var(--gold);
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .motivation-box p {
+    color: #a8c4f5;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* HIDDEN WEEKS */
+  .week-content { display: none; }
+  .week-content.active { display: block; }
+
+  /* CONFETTI */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    animation: confetti-fall 1.5s ease-in forwards;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    .week-btn { font-size: 11px; padding: 8px 6px; }
+    .card-title { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stars-bg" id="starsBg"></div>
+  <div class="header-inner">
+    <span class="cheer-emoji">📣</span>
+    <h1>Parker's <span>Cheer</span> Countdown</h1>
+    <p class="subtitle">All Star Tryout Training · April 2026</p>
+  </div>
+</header>
+
+<div class="progress-section">
+  <div class="progress-label">⭐ Overall Progress</div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="globalBar" style="width:0%"></div>
+  </div>
+  <div class="progress-text" id="globalText">0 of 0 tasks complete</div>
+  <div class="skills-earned">
+    <div class="skill-badge" id="badge-bwo">✓ Back Walkover</div>
+    <div class="skill-badge" id="badge-fwo">Front Walkover</div>
+    <div class="skill-badge" id="badge-bhs">Back Handspring</div>
+  </div>
+</div>
+
+<main>
+  <div class="week-nav" id="weekNav"></div>
+  <div id="weeksContainer"></div>
+
+  <div class="motivation-box">
+    <h3>You've Got This, Parker! 💙</h3>
+    <p>Every practice makes you stronger, more flexible, and more ready.<br>
+    Believe in yourself -- cheer tryouts are YOUR moment to shine! ⭐</p>
+  </div>
+</main>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'parker_cheer_2025';
+
+// Stretching block -- same every practice (4 min)
+function stretch() {
+  return [
+    { id: 'str1', name: 'Bridge holds (5 sec each, 4x)', tip: 'Push your hips high and breathe!', dur: '1 min', section: 'stretch' },
+    { id: 'str2', name: 'Shoulder stretch -- clasped hands overhead', tip: 'Arms straight, reach back behind your head', dur: '45 sec', section: 'stretch' },
+    { id: 'str3', name: 'Right leg split stretch', tip: 'Square your hips, lean forward over front leg', dur: '1 min', section: 'stretch' },
+    { id: 'str4', name: 'Middle splits hold', tip: 'Walk hands forward, keep legs straight', dur: '1 min 15 sec', section: 'stretch' },
+  ];
+}
+
+// Practice drills — 4 real weeks, each with Sat/Sun/Tue/Thu
+const WEEK_PLANS = {
+  1: {
+    label: 'Week 1: Polish & Explore',
+    days: [
+      {
+        date: 'Sat Apr 5', theme: 'Back Walkover Day 1', day: 'SAT',
+        skills: [
+          { id: 'w1d1_s1', name: 'Backbend kickover on mat (8x)', tip: 'Lead with your heel, push through your hands', dur: '5 min' },
+          { id: 'w1d1_s2', name: 'One-arm bridge push-up (3x each side)', tip: 'Build that shoulder strength!', dur: '3 min' },
+          { id: 'w1d1_s3', name: 'Spotted back walkover (5x)', tip: 'Mom spots: hand on low back + hip', dur: '6 min' },
+          { id: 'w1d1_s4', name: 'Back walkover attempt solo (3x)', tip: 'You got this -- go for it!', dur: '4 min' },
+          { id: 'w1d1_s5', name: 'Front limber on mat with Mom spot (5x)', tip: 'Walk over from bridge position', dur: '5 min' },
+          { id: 'w1d1_s6', name: 'Cartwheel -> one-arm cartwheel (5x)', tip: 'Building to front walkover', dur: '3 min' },
+        ]
+      },
+      {
+        date: 'Sun Apr 6', theme: 'Front Walkover Foundation', day: 'SUN',
+        skills: [
+          { id: 'w1d2_s1', name: 'Front limber on mat (6x)', tip: 'Kick up to handstand, arch down', dur: '5 min' },
+          { id: 'w1d2_s2', name: 'Handstand hold against wall (3x, 10 sec)', tip: 'Straight body, squeeze everything!', dur: '3 min' },
+          { id: 'w1d2_s3', name: 'Handstand forward roll on mat (5x)', tip: 'Tuck chin, slow and controlled', dur: '5 min' },
+          { id: 'w1d2_s4', name: 'Spotted front walkover attempt (5x)', tip: 'Mom spots: hip + leg to push through', dur: '6 min' },
+          { id: 'w1d2_s5', name: 'Back walkover review (4x)', tip: 'Keep those toes pointed!', dur: '3 min' },
+        ]
+      },
+      {
+        date: 'Tue Apr 8', theme: 'Strength + Back Walkover', day: 'TUE',
+        skills: [
+          { id: 'w1d3_s1', name: 'Bridge rocks (10x)', tip: 'Push from shoulders, rock back & forth', dur: '3 min' },
+          { id: 'w1d3_s2', name: 'Backbend kickover on mat (10x)', tip: 'Really kick that leg!', dur: '4 min' },
+          { id: 'w1d3_s3', name: 'Spotted back walkover (6x)', tip: 'Practice the arm swing -- one arm leads', dur: '6 min' },
+          { id: 'w1d3_s4', name: 'Solo back walkover attempts (4x)', tip: 'Trust your body -- you can do this!', dur: '5 min' },
+          { id: 'w1d3_s5', name: 'Front limber on mat (5x)', tip: 'Keep building that front walkover!', dur: '4 min' },
+        ]
+      },
+      {
+        date: 'Thu Apr 10', theme: 'Back Handspring Intro', day: 'THU',
+        skills: [
+          { id: 'w1d4_s1', name: 'Jump back into bridge (5x, spotted)', tip: 'Mom spots both hips -- jump and arch!', dur: '5 min' },
+          { id: 'w1d4_s2', name: 'Back walkover run-through (5x)', tip: 'Clean and confident -- toes pointed', dur: '5 min' },
+          { id: 'w1d4_s3', name: 'Sitting jump back to mat (5x)', tip: 'Sit on mat edge, jump back to bridge -- feel the back handspring shape', dur: '5 min' },
+          { id: 'w1d4_s4', name: 'Spotted back handspring on air mat (4x)', tip: 'Mom spots: two hands under low back -- BIG jump, keep arms by ears', dur: '7 min' },
+        ]
+      },
+    ]
+  },
+  2: {
+    label: 'Week 2: Build',
+    days: [
+      {
+        date: 'Sat Apr 12', theme: 'Front Walkover Push', day: 'SAT',
+        skills: [
+          { id: 'w2d1_s1', name: 'Handstand hold (3x, 15 sec)', tip: 'Tight body, squeeze glutes!', dur: '3 min' },
+          { id: 'w2d1_s2', name: 'Front limber to standing (6x)', tip: 'Finish standing tall, arms up', dur: '4 min' },
+          { id: 'w2d1_s3', name: 'Spotted front walkover (6x)', tip: 'One leg high, push over your hands', dur: '7 min' },
+          { id: 'w2d1_s4', name: 'Front walkover solo attempt (3x)', tip: 'Give it a try!', dur: '4 min' },
+          { id: 'w2d1_s5', name: 'Back walkover clean run (4x)', tip: 'Perfecting the details -- straight legs!', dur: '4 min' },
+        ]
+      },
+      {
+        date: 'Sun Apr 13', theme: 'Back Handspring Day', day: 'SUN',
+        skills: [
+          { id: 'w2d2_s1', name: 'Bridge to stand-up (5x)', tip: 'Push hard through hands to stand', dur: '3 min' },
+          { id: 'w2d2_s2', name: 'Jump back to mat drill (5x)', tip: 'Focus on jumping UP, not back', dur: '3 min' },
+          { id: 'w2d2_s3', name: 'Spotted back handspring (6x)', tip: 'SNAP those feet together on landing!', dur: '7 min' },
+          { id: 'w2d2_s4', name: 'Back walkover into BHS feel drill (3x)', tip: 'One after the other -- future combo!', dur: '5 min' },
+          { id: 'w2d2_s5', name: 'Cheer jump practice (tuck + herkie) (10x)', tip: 'High knees, smile big!', dur: '4 min' },
+        ]
+      },
+      {
+        date: 'Tue Apr 15', theme: 'Combo Skills', day: 'TUE',
+        skills: [
+          { id: 'w2d3_s1', name: 'Backbend kickover (8x, fast pace)', tip: 'Building power!', dur: '3 min' },
+          { id: 'w2d3_s2', name: 'Back walkover (5x clean)', tip: 'Chin up, toes pointed, SMILE', dur: '4 min' },
+          { id: 'w2d3_s3', name: 'Spotted front walkover (6x)', tip: 'Higher kick = easier walkover', dur: '6 min' },
+          { id: 'w2d3_s4', name: 'BHS on air mat spotted (5x)', tip: 'Arms by ears the whole time!', dur: '6 min' },
+          { id: 'w2d3_s5', name: 'Round off on mat (4x)', tip: 'Great for BHS combo later!', dur: '3 min' },
+        ]
+      },
+      {
+        date: 'Thu Apr 17', theme: 'Power + Polish', day: 'THU',
+        skills: [
+          { id: 'w2d4_s1', name: 'Back walkover (6x, no spot)', tip: 'You own this skill!', dur: '5 min' },
+          { id: 'w2d4_s2', name: 'Front walkover attempts (6x, light spot)', tip: 'Getting closer every time!', dur: '6 min' },
+          { id: 'w2d4_s3', name: 'BHS spotted hard attempts (5x)', tip: 'Jump UP then back -- punch the floor!', dur: '7 min' },
+          { id: 'w2d4_s4', name: 'Cheer arms + motion drills (1 min)', tip: 'Clean sharp arms = tryout points!', dur: '4 min' },
+        ]
+      },
+    ]
+  },
+  3: {
+    label: 'Week 3: Refine',
+    days: [
+      {
+        date: 'Sat Apr 19', theme: 'Front Walkover Breakthrough', day: 'SAT',
+        skills: [
+          { id: 'w3d1_s1', name: 'Leg flexibility drill (right split 3x60sec)', tip: 'Breathe through it!', dur: '4 min' },
+          { id: 'w3d1_s2', name: 'Handstand kick to walkover on mat (6x)', tip: 'Trust the kick!', dur: '5 min' },
+          { id: 'w3d1_s3', name: 'Front walkover (attempt 8x -- vary spot level)', tip: 'If you get one solo, celebrate HUGE!', dur: '8 min' },
+          { id: 'w3d1_s4', name: 'Back walkover to front walkover flow (3x)', tip: 'Combo moves for tryout wow-factor', dur: '5 min' },
+        ]
+      },
+      {
+        date: 'Sun Apr 20', theme: 'Back Handspring Focus', day: 'SUN',
+        skills: [
+          { id: 'w3d2_s1', name: 'BHS punch drill from panel mat edge (5x)', tip: 'Punch the floor, arms by ears!', dur: '4 min' },
+          { id: 'w3d2_s2', name: 'Spotted BHS (6x)', tip: 'Light spot -- YOU are doing the work!', dur: '7 min' },
+          { id: 'w3d2_s3', name: 'Round-off BHS attempt (3x spotted)', tip: 'Big round-off, then punch!', dur: '6 min' },
+          { id: 'w3d2_s4', name: 'Run-through all 3 skills (BWO, FWO, BHS)', tip: 'Tryout confidence!', dur: '5 min' },
+        ]
+      },
+      {
+        date: 'Tue Apr 22', theme: 'Strength + Consistency', day: 'TUE',
+        skills: [
+          { id: 'w3d3_s1', name: 'Back walkover (6x clean, no spot)', tip: 'Perfecting it for the judges!', dur: '5 min' },
+          { id: 'w3d3_s2', name: 'Front walkover (6x)', tip: 'Show that right leg!', dur: '6 min' },
+          { id: 'w3d3_s3', name: 'BHS on air mat (5x spotted)', tip: 'Getting so close!', dur: '6 min' },
+          { id: 'w3d3_s4', name: 'Cheer jumps (5 tucks + 5 herkies)', tip: 'FULL effort -- pump it up!', dur: '5 min' },
+        ]
+      },
+      {
+        date: 'Thu Apr 24', theme: 'Mock Tryout Day 1', day: 'THU',
+        skills: [
+          { id: 'w3d4_s1', name: 'Warm-up: run-through all stretches (4 min)', tip: 'Game day warm-up!', dur: '4 min' },
+          { id: 'w3d4_s2', name: 'Back walkover x3 -- judge ready', tip: 'Best toes, biggest smile, chin up', dur: '4 min' },
+          { id: 'w3d4_s3', name: 'Front walkover x3 -- give your best!', tip: 'Even a spotted one is showing progress!', dur: '5 min' },
+          { id: 'w3d4_s4', name: 'BHS x3 -- spotted strong attempt', tip: 'Commit to the jump!', dur: '5 min' },
+          { id: 'w3d4_s5', name: 'Jumps: tuck + herkie + toe touch (3x each)', tip: 'Arms up, land clean!', dur: '4 min' },
+        ]
+      },
+    ]
+  },
+  4: {
+    label: 'Week 4: Game Week',
+    days: [
+      {
+        date: 'Sat Apr 26', theme: 'Final Polish', day: 'SAT',
+        skills: [
+          { id: 'w4d1_s1', name: 'Back walkover (5x perfect)', tip: 'Every. Single. Detail. Toes, chin, arms!', dur: '5 min' },
+          { id: 'w4d1_s2', name: 'Front walkover (5x your best)', tip: 'You worked SO hard for this!', dur: '6 min' },
+          { id: 'w4d1_s3', name: 'BHS (4x spotted)', tip: 'Light spot -- show your power!', dur: '6 min' },
+          { id: 'w4d1_s4', name: 'Full skill run-through (all 3 in a row)', tip: 'BWO -> FWO -> BHS -- YOU HAVE GOT THIS!', dur: '5 min' },
+        ]
+      },
+      {
+        date: 'Sun Apr 27', theme: 'Confidence + Fun', day: 'SUN',
+        skills: [
+          { id: 'w4d2_s1', name: 'Easy fun warm-up: cartwheels + round-offs (8x)', tip: 'Loose and happy -- enjoy it!', dur: '4 min' },
+          { id: 'w4d2_s2', name: 'Back walkover (4x -- feel how great you are!)', tip: 'You OWN this skill!', dur: '4 min' },
+          { id: 'w4d2_s3', name: 'Front walkover (4x)', tip: 'So much stronger than week 1!', dur: '4 min' },
+          { id: 'w4d2_s4', name: 'BHS (3x spotted -- easy does it)', tip: 'No pressure, just fun!', dur: '4 min' },
+          { id: 'w4d2_s5', name: 'Cheer jump celebration: ALL your jumps!', tip: 'You are READY, Parker!', dur: '5 min' },
+        ]
+      },
+      {
+        date: 'Tue Apr 29', theme: 'Last Tune-Up', day: 'TUE',
+        skills: [
+          { id: 'w4d3_s1', name: 'Gentle stretch warm-up (4 min)', tip: 'Take care of your body today!', dur: '4 min' },
+          { id: 'w4d3_s2', name: 'Back walkover (4x -- smooth and clean)', tip: 'Pretend you are already at tryouts!', dur: '4 min' },
+          { id: 'w4d3_s3', name: 'Front walkover (4x -- give it everything)', tip: 'No holding back!', dur: '5 min' },
+          { id: 'w4d3_s4', name: 'BHS (3x -- lightest spot possible)', tip: 'You are SO close to solo!', dur: '5 min' },
+          { id: 'w4d3_s5', name: 'Dance + cheer: just have FUN for 4 min', tip: 'You deserve to celebrate!', dur: '4 min' },
+        ]
+      },
+      {
+        date: 'Wed Apr 30', theme: 'EVE OF TRYOUTS ★', day: 'WED',
+        skills: [
+          { id: 'w4d4_s1', name: 'Light bridges x5', tip: 'Nice and easy -- keep it warm', dur: '3 min' },
+          { id: 'w4d4_s2', name: 'Back walkover x2 (best ever)', tip: 'This is your victory lap!', dur: '3 min' },
+          { id: 'w4d4_s3', name: 'Front walkover x2 (best effort)', tip: 'You have trained so hard!', dur: '3 min' },
+          { id: 'w4d4_s4', name: 'BHS x1 spotted, then REST', tip: 'Save your energy for tomorrow!', dur: '3 min' },
+          { id: 'w4d4_s5', name: 'Close your eyes, picture making the team', tip: 'See it, believe it, BE it!', dur: '3 min' },
+          { id: 'w4d4_s6', name: 'Big hug, early bed, sweet dreams', tip: 'Tomorrow is YOUR day, Parker!', dur: '1 min' },
+        ]
+      },
+    ]
+  },
+};
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+let activeWeek = 1;
+
+// ─── HELPERS ────────────────────────────────────────────────────────────────
+
+function getTodayDate() {
+  const d = new Date();
+  return d.toDateString();
+}
+
+function dateStrToObj(str) {
+  // e.g. "Sat Apr 5" -> parse
+  return new Date(str + ', 2026');
+}
+
+function isToday(dateStr) {
+  const d = dateStrToObj(dateStr);
+  const t = new Date();
+  return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear();
+}
+
+function isPast(dateStr) {
+  const d = dateStrToObj(dateStr);
+  const t = new Date(); t.setHours(0,0,0,0);
+  return d < t;
+}
+
+function getTaskId(weekKey, dayIdx, taskId) {
+  return `w${weekKey}_d${dayIdx}_${taskId}`;
+}
+
+function buildFullTaskId(weekKey, dayIdx, task) {
+  return `${weekKey}_${dayIdx}_${task.id}`;
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+
+function countAll() {
+  let total = 0, done = 0;
+  Object.keys(WEEK_PLANS).forEach(wk => {
+    WEEK_PLANS[wk].days.forEach((day, di) => {
+      const stretchTasks = stretch();
+      const allTasks = [...stretchTasks, ...day.skills];
+      allTasks.forEach(t => {
+        const id = `${wk}_${di}_${t.id}`;
+        total++;
+        if (state[id]) done++;
+      });
+    });
+  });
+  return { total, done };
+}
+
+function isDayComplete(weekKey, dayIdx) {
+  const day = WEEK_PLANS[weekKey].days[dayIdx];
+  const allTasks = [...stretch(), ...day.skills];
+  return allTasks.every(t => state[`${weekKey}_${dayIdx}_${t.id}`]);
+}
+
+function renderGlobal() {
+  const { total, done } = countAll();
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('globalBar').style.width = pct + '%';
+  document.getElementById('globalText').textContent = `${done} of ${total} tasks complete · ${pct}%`;
+
+  // Skill badges: back walkover always earned
+  document.getElementById('badge-bwo').classList.add('earned');
+  // FWO and BHS unlock after week 3
+  const totalDone = done;
+  if (totalDone >= 60) document.getElementById('badge-fwo').classList.add('earned');
+  if (totalDone >= 80) document.getElementById('badge-bhs').classList.add('earned');
+}
+
+function renderWeekNav() {
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = '';
+  Object.keys(WEEK_PLANS).forEach(wk => {
+    const wkObj = WEEK_PLANS[wk];
+    const btn = document.createElement('button');
+    btn.className = 'week-btn' + (parseInt(wk) === activeWeek ? ' active' : '');
+    // Count progress
+    let total = 0, done = 0;
+    wkObj.days.forEach((day, di) => {
+      const allTasks = [...stretch(), ...day.skills];
+      allTasks.forEach(t => {
+        total++; if (state[`${wk}_${di}_${t.id}`]) done++;
+      });
+    });
+    btn.innerHTML = `Wk ${wk}<span class="week-prog">${done}/${total}</span>`;
+    btn.onclick = () => { activeWeek = parseInt(wk); renderAll(); };
+    nav.appendChild(btn);
+  });
+}
+
+function renderPractices() {
+  const container = document.getElementById('weeksContainer');
+  container.innerHTML = '';
+  const wkKey = String(activeWeek);
+  const wkData = WEEK_PLANS[wkKey];
+  const div = document.createElement('div');
+  div.className = 'week-content active';
+
+  wkData.days.forEach((day, dayIdx) => {
+    const todayFlag = isToday(day.date);
+    const pastFlag = isPast(day.date);
+    const completeFlag = isDayComplete(wkKey, dayIdx);
+
+    const card = document.createElement('div');
+    card.className = 'practice-card' + (todayFlag ? ' today' : '') + (completeFlag ? ' complete' : '');
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    const allT = [...stretch(), ...day.skills];
+    const doneCt = allT.filter(t => state[`${wkKey}_${dayIdx}_${t.id}`]).length;
+    header.innerHTML = `
+      <div class="card-header-left">
+        <div class="date-badge">${day.day}<br><small style="font-family:Nunito;font-size:10px;font-weight:700">${day.date.split(' ').slice(1).join(' ')}</small></div>
+        <div>
+          <div class="card-title">${day.theme} ${todayFlag ? '<span class="today-tag">TODAY</span>' : ''}</div>
+          <div class="card-sub">30 min · ${allT.length} tasks · <span class="done-count">${doneCt}</span>/${allT.length} done</div>
+        </div>
+      </div>
+      <div class="card-status ${completeFlag ? 'done' : ''}">
+        ${completeFlag ? '✅ Done!' : (pastFlag && !completeFlag && !todayFlag ? '⬜ Missed' : '▶')}
+        <span class="chevron ${todayFlag || completeFlag ? 'open' : ''}">▼</span>
+      </div>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'card-body' + (todayFlag || completeFlag ? ' open' : '');
+
+    // Stretch section label — use createElement to avoid innerHTML clobbering
+    const stretchLabel = document.createElement('div');
+    stretchLabel.className = 'section-label';
+    stretchLabel.textContent = '🧘 4-Minute Stretch Warm-Up';
+    body.appendChild(stretchLabel);
+
+    stretch().forEach(t => {
+      body.appendChild(buildTaskItem(wkKey, dayIdx, t, card, header, body));
+    });
+
+    // Skills section label
+    const skillsLabel = document.createElement('div');
+    skillsLabel.className = 'section-label section-gap';
+    skillsLabel.textContent = '⭐ Skills Practice (26 min)';
+    body.appendChild(skillsLabel);
+
+    day.skills.forEach(t => {
+      body.appendChild(buildTaskItem(wkKey, dayIdx, t, card, header, body));
+    });
+
+    // Complete stamp
+    const stamp = document.createElement('div');
+    stamp.className = 'complete-stamp' + (completeFlag ? ' show' : '');
+    stamp.id = `stamp_${wkKey}_${dayIdx}`;
+    stamp.innerHTML = `<div class="stamp-emoji">🌟</div><p>Practice Complete! Amazing work, Parker!</p>`;
+    body.appendChild(stamp);
+
+    header.onclick = () => {
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      header.querySelector('.chevron').classList.toggle('open', !isOpen);
+    };
+
+    card.appendChild(header);
+    card.appendChild(body);
+    div.appendChild(card);
+  });
+
+  container.appendChild(div);
+}
+
+function buildTaskItem(wkKey, dayIdx, task, card, header, body) {
+  const id = `${wkKey}_${dayIdx}_${task.id}`;
+  const checked = !!state[id];
+  const item = document.createElement('div');
+  item.className = 'task-item' + (checked ? ' checked' : '');
+  item.innerHTML = `
+    <div class="task-check">${checked ? '✓' : ''}</div>
+    <div class="task-text">
+      <div class="task-name">${task.name}</div>
+      ${task.tip ? `<div class="task-tip">💡 ${task.tip}</div>` : ''}
+    </div>
+    <div class="task-duration">${task.dur}</div>
+  `;
+  item.onclick = () => {
+    state[id] = !state[id];
+    saveState(state);
+
+    // Toggle this item's visual in-place — no full re-render
+    item.classList.toggle('checked', !!state[id]);
+    item.querySelector('.task-check').textContent = state[id] ? '✓' : '';
+    if (state[id]) confetti(item);
+
+    // Update done count in header
+    const allT = [...stretch(), ...WEEK_PLANS[wkKey].days[dayIdx].skills];
+    const doneCt = allT.filter(t => state[`${wkKey}_${dayIdx}_${t.id}`]).length;
+    const doneEl = header.querySelector('.done-count');
+    if (doneEl) doneEl.textContent = doneCt;
+
+    // Check if day complete
+    const dayComplete = allT.every(t => state[`${wkKey}_${dayIdx}_${t.id}`]);
+    if (dayComplete) {
+      const stamp = document.getElementById(`stamp_${wkKey}_${dayIdx}`);
+      if (stamp) stamp.classList.add('show');
+      card.classList.add('complete');
+      bigConfetti();
+    } else {
+      card.classList.remove('complete');
+    }
+
+    // Update global progress bar without re-rendering cards
+    renderGlobal();
+    renderWeekNav();
+  };
+  return item;
+}
+
+function renderAll() {
+  renderGlobal();
+  renderWeekNav();
+  renderPractices();
+  // Auto-open today's week
+}
+
+// ─── STARS ──────────────────────────────────────────────────────────────────
+
+function makeStars() {
+  const bg = document.getElementById('starsBg');
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.textContent = '★';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.fontSize = (10 + Math.random() * 12) + 'px';
+    bg.appendChild(s);
+  }
+}
+
+// ─── CONFETTI ───────────────────────────────────────────────────────────────
+
+function confetti(el) {
+  const colors = ['#f5c842','#0a1f44','#ffffff','#22c55e','#f97316'];
+  const rect = el.getBoundingClientRect();
+  for (let i = 0; i < 8; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.left = (rect.left + Math.random() * rect.width) + 'px';
+    c.style.top = rect.top + 'px';
+    c.style.animationDelay = Math.random() * 0.3 + 's';
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
+  }
+}
+
+function bigConfetti() {
+  const colors = ['#f5c842','#0a1f44','#ffffff','#22c55e','#f97316','#a855f7'];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = '-20px';
+    c.style.animationDelay = Math.random() * 0.8 + 's';
+    c.style.width = c.style.height = (6 + Math.random() * 10) + 'px';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2500);
+  }
+}
+
+// ─── AUTO WEEK ───────────────────────────────────────────────────────────────
+
+function findTodayWeek() {
+  const today = new Date();
+  for (const wk of Object.keys(WEEK_PLANS)) {
+    for (const day of WEEK_PLANS[wk].days) {
+      const d = dateStrToObj(day.date);
+      if (d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) return parseInt(wk);
+    }
+  }
+  // Default to the week containing the nearest upcoming practice
+  for (const wk of Object.keys(WEEK_PLANS)) {
+    for (const day of WEEK_PLANS[wk].days) {
+      const d = dateStrToObj(day.date);
+      if (d >= today) return parseInt(wk);
+    }
+  }
+  return 1;
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+makeStars();
+activeWeek = findTodayWeek();
+renderAll();
+</script>
+</body>
+</html>
